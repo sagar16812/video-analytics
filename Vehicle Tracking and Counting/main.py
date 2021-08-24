@@ -5,7 +5,7 @@ from time import sleep
 
 
 parser = argparse.ArgumentParser(
-description='Script to run MobileNet-SSD object detection network ')
+description='Vehicle Tracking and Counting')
 parser.add_argument("--video", default = 'video.mp4', help="path to video file")
 args = parser.parse_args()
 

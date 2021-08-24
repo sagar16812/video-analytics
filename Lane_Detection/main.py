@@ -9,7 +9,7 @@ from tqdm import tqdm_notebook
 import matplotlib.pyplot as plt
 
 parser = argparse.ArgumentParser(
-description='Script to run MobileNet-SSD object detection network ')
+description='Lane Detection')
 parser.add_argument("--video", default = 'LD_video.mp4', help="path to video file")
 parser.add_argument("--adjustby", default = 0, help="adjust the position of polygon, e.g. if -10 then shift the polygon to upward, please make sure it is in the range of 0 to 70")
 args = parser.parse_args()
