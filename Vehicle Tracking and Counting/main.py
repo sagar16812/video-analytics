@@ -6,6 +6,7 @@ from time import sleep
 
 parser = argparse.ArgumentParser(
 description='Vehicle Tracking and Counting')
+parser.add_argument("--generate", default = 'No', help="generate an output video")
 parser.add_argument("--video", default = 'video.mp4', help="path to video file")
 args = parser.parse_args()
 
@@ -32,12 +33,24 @@ def roi_center(x, y, w, h):
 cap = cv2.VideoCapture(args.video)
 subtractor = cv2.bgsegm.createBackgroundSubtractorMOG()
 
+counter = 0
+img_array = []
+fps = cap.get(cv2.CAP_PROP_FPS)
+print("input video fps: {}".format(fps))
+
+# write the sample output video
+video_size = (1280,int(720/2))
+if (args.generate == "yes"):
+    out = cv2.VideoWriter('video_out.avi',cv2.VideoWriter_fourcc(*'MJPG'), fps, video_size)
+
 while True:
     ret , current_frame = cap.read()
+    counter+=1
     if current_frame is None:
         print("End of the video")
         break
     rows, cols, channels = current_frame.shape
+    
     # line_ypos=int(0.7638*rows)
 
     tempo = float(1/delay)
@@ -82,8 +95,15 @@ while True:
     cv2.putText(current_frame, "VEHICLE ENTER COUNT : "+str(vehicles_in), (20, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 50),2)
     cv2.putText(current_frame, "VEHICLE EXIT COUNT : "+str(vehicles_out), (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 50),2)
     cv2.putText(current_frame, "TOTAL VEHICLE COUNT : "+str(vehicles_out+vehicles_in), (20, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 50),2)
-    cv2.imshow("Video Original" , current_frame)
-    cv2.imshow("Detector",dilate)
+
+
+    if (args.generate == "yes"):
+        # print(dilate.shape)
+        outvid = cv2.cvtColor(dilate,cv2.COLOR_GRAY2RGB)
+        outvid = cv2.hconcat([current_frame, outvid])
+        outvid = cv2.resize(outvid, video_size) 
+        out.write(outvid)
+    cv2.imshow("Video" , outvid)
 
     if cv2.waitKey(1) == 27:
         break
@@ -95,3 +115,5 @@ while True:
     #     break
 cv2.destroyAllWindows()
 cap.release()
+out.release()        
+    

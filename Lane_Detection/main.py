@@ -11,24 +11,32 @@ import matplotlib.pyplot as plt
 parser = argparse.ArgumentParser(
 description='Lane Detection')
 parser.add_argument("--video", default = 'LD_video.mp4', help="path to video file")
+parser.add_argument("--generate", default = 'No', help="generate an output video")
 parser.add_argument("--adjustby", default = 0, help="adjust the position of polygon, e.g. if -10 then shift the polygon to upward, please make sure it is in the range of 0 to 70")
 args = parser.parse_args()
-
 adjustby = int(args.adjustby)
-print(adjustby)
+#print(adjustby)
+
 if adjustby < 0 or adjustby > (270-160):
-    print('polygon adjusting factor is invallid, please make sure it is in the range of 0 to 70')
+    print('polygon adjusting factor is invalid, please make sure it is in the range of 0 to 70')
     sys.exit("aa! errors!")
 
 cap = cv2.VideoCapture(args.video)
 
+counter = 0
+img_array = []
+fps = cap.get(cv2.CAP_PROP_FPS)
+print("input video fps: {}".format(fps))
+
+video_size = (480,270) # set the output video size
+
 while True:
     ret , frame = cap.read()
-    
+    counter+=1    
     if frame is None:
         print("End of the video")
         break
-    current_frame = cv2.resize(frame,(480,270))
+    current_frame = cv2.resize(frame, video_size) 
     rows, cols, channels = current_frame.shape
     # create a zero array
     stencil = np.zeros_like(current_frame[:,:,0])
@@ -55,19 +63,22 @@ while True:
     # plt.show()
 
     lines = cv2.HoughLinesP(thresh, 1, np.pi/180, 30, maxLineGap=200)
-    print('type of lines: {}'.format(type(lines)))
+    #print('type of lines: {}'.format(type(lines)))
+    
     # create a copy of the original frame
-    dmy = current_frame[:,:,0].copy()
+    dmy = current_frame.copy()
     # draw Hough lines
     if lines is not None:
         for line in lines:
             x1, y1, x2, y2 = line[0]
             cv2.line(dmy, (x1, y1), (x2, y2), (255, 0, 0), 3)
+
+    if (args.generate == "yes"):
+        img_array.append(dmy)
+
     # plot frame
-    cv2.imshow("Output",dmy)
+    cv2.imshow("Output",dmy)        
 
-
-    
     if cv2.waitKey(1) == 27:
         break
     # key = cv2.waitKey(0)
@@ -76,5 +87,14 @@ while True:
     # # Quit when 'q' is pressed
     # if key == ord('q'):
     #     break
+         
 cv2.destroyAllWindows()
 cap.release()
+
+
+# write the sample output video
+if (args.generate == "yes"):
+    out = cv2.VideoWriter('LD_video_out.avi',cv2.VideoWriter_fourcc(*'MJPG'), fps, video_size)
+    for i in range(len(img_array)):
+        out.write(img_array[i])
+    out.release()
