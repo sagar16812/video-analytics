@@ -41,7 +41,7 @@ print("input video fps: {}".format(fps))
 # write the sample output video
 video_size = (1280,int(720/2))
 if (args.generate == "yes"):
-    out = cv2.VideoWriter('video_out.avi',cv2.VideoWriter_fourcc(*'MJPG'), fps, video_size)
+    out = cv2.VideoWriter('video_out.mp4',cv2.VideoWriter_fourcc(*'MP4V'), fps, video_size)
 
 while True:
     ret , current_frame = cap.read()

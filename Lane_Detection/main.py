@@ -94,7 +94,7 @@ cap.release()
 
 # write the sample output video
 if (args.generate == "yes"):
-    out = cv2.VideoWriter('LD_video_out.avi',cv2.VideoWriter_fourcc(*'MJPG'), fps, video_size)
+    out = cv2.VideoWriter('LD_video_out.mp4',cv2.VideoWriter_fourcc(*'MP4V'), fps, video_size)
     for i in range(len(img_array)):
         out.write(img_array[i])
     out.release()
