@@ -6,7 +6,7 @@ from time import sleep
 
 parser = argparse.ArgumentParser(
 description='Vehicle Tracking and Counting')
-parser.add_argument("--generate", default = 'No', help="generate an output video")
+parser.add_argument("--generate", default = 'no', help="generate an output video")
 parser.add_argument("--video", default = 'video.mp4', help="path to video file")
 args = parser.parse_args()
 
@@ -40,6 +40,7 @@ print("input video fps: {}".format(fps))
 
 # write the sample output video
 video_size = (1280,int(720/2))
+#video_size = (int(1280/2),720)
 if (args.generate == "yes"):
     out = cv2.VideoWriter('video_out.mp4',cv2.VideoWriter_fourcc(*'MP4V'), fps, video_size)
 
@@ -103,7 +104,10 @@ while True:
         outvid = cv2.hconcat([current_frame, outvid])
         outvid = cv2.resize(outvid, video_size) 
         out.write(outvid)
-    cv2.imshow("Video" , outvid)
+        cv2.imshow("Video" , outvid)
+    else:
+        cv2.imshow("Video" , current_frame)
+    
 
     if cv2.waitKey(1) == 27:
         break
@@ -115,5 +119,6 @@ while True:
     #     break
 cv2.destroyAllWindows()
 cap.release()
-out.release()        
+if (args.generate == "yes"):
+    out.release()        
     
